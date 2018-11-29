@@ -1,28 +1,19 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import dva from 'dva';
+import createLoading from 'dva-loading';
+import { createMemoryHistory as createHistory } from "history";
+import user from './models/user';
+import RouterConfig from './routes';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+const app = dva({
+  history: createHistory(),
+  ...createLoading(),
+  initialState: {}
+});
+
+app.model(user);
+
+app.router(RouterConfig);
+
+const App = app.start();
 
 export default App;
