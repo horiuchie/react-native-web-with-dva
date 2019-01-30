@@ -4,9 +4,9 @@ import { View, Text } from 'react-native';
 import Page from '../components/Page';
 
 const LAYOUT = 1;
-const SPLIT = true;
+const SPLIT = false;
 const SUB = true;
-const FOOTER_SIZE = { width: '100%', height: 30 };
+const FOOTER_HEIGHT = 60;
 
 const Widget = ({ no, style }) => (
   <View
@@ -75,9 +75,9 @@ const mainStyle = (orientation, parentSize, maximize, split) => {
   }
 };
 
-const footerStyle = (orientation, parentSize, footerSize, maximize, split) => {
+const footerStyle = (orientation, parentSize, footerHeight, maximize, split) => {
   const cond = `(${orientation}, ${maximize})`;
-  const baseStyle = { height: footerSize.height, borderColor: 'yellow', borderWidth: footerSize.height < 1 ? 0 : 2 };
+  const baseStyle = { height: footerHeight, borderColor: 'yellow', borderWidth: footerHeight < 1 ? 0 : 2 };
   switch (cond) {
     case '(landscape, false)': {
       const percentage = split ? 0.5 : 0.712;
@@ -118,7 +118,7 @@ const dStyle = (orientation, layout, parentSize, split) => {
     case 3:
       return { display: 'none' };
     case 4:
-      return { ...subStyle(orientation, parentSize, SUB), order: 3 };
+      return split ? { display: 'none' } : { ...subStyle(orientation, parentSize, SUB), order: 3 };
     default:
       return {};
   }
@@ -126,14 +126,14 @@ const dStyle = (orientation, layout, parentSize, split) => {
 
 const bStyle = (orientation, layout, parentSize, split) => {
   const maximize = R.includes(layout, [2, 3]);
-  return { ...footerStyle(orientation, parentSize, FOOTER_SIZE, maximize, split), order: 2 };
+  return { ...footerStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, split), order: 2 };
 };
 
 const vStyle = (orientation, layout, parentSize, split) => {
   const maximize = R.includes(layout, [2, 3]);
   switch (layout) {
     case 1:
-      return { ...subStyle(orientation, parentSize, SUB), order: 3/*, display: 'none'*/ };
+      return split ? { display: 'none' } : { ...subStyle(orientation, parentSize, SUB), order: 3 };
     case 2:
       return { display: 'none' };
     case 3: {
@@ -147,16 +147,16 @@ const vStyle = (orientation, layout, parentSize, split) => {
   }
 };
 
-const iStyle = (orientation, layout, parentSize) => {
+const iStyle = (orientation, layout, parentSize, split) => {
   switch (layout) {
     case 1:
-      return interactionStyle(orientation, parentSize);
+      return split ? { display: 'none' } : interactionStyle(orientation, parentSize);
     case 2:
       return { display: 'none' };
     case 3:
       return { display: 'none' };
     case 4:
-      return interactionStyle(orientation, parentSize);
+      return split ? { display: 'none' } : interactionStyle(orientation, parentSize);
     default:
       return {};
   }
@@ -211,7 +211,7 @@ class HomePage extends Component {
 
     const widget4Props = {
       no: 'i',
-      style: iStyle(this.state.orientation, LAYOUT, { width, height })
+      style: iStyle(this.state.orientation, LAYOUT, { width, height }, SPLIT)
     };
     
     const widget5Props = {
