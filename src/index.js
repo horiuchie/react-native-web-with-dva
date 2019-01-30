@@ -1,6 +1,6 @@
+import '@babel/polyfill';
 import React from 'react';
 import { AppRegistry } from 'react-native';
-import 'babel-polyfill';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
