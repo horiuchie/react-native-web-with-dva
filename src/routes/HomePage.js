@@ -4,7 +4,7 @@ import { View, Text } from 'react-native';
 import Page from '../components/Page';
 
 const LAYOUT = 1;
-const SPLIT = false;
+const DETAIL = false;
 const SUB = true;
 const FOOTER_HEIGHT = 60;
 
@@ -23,7 +23,8 @@ const Widget = ({ no, style }) => (
   </View>
 );
 
-const interactionStyle = (orientation, parentSize) => ({
+const interactionStyle = (orientation, parentSize, detail) => ({
+  display: detail ? 'none' : 'flex',
   flexGrow: orientation === 'landscape' ? 1 : 0,
   order: 4,
   borderColor: 'green',
@@ -38,7 +39,8 @@ const interactionStyle = (orientation, parentSize) => ({
       : parentSize.height * 0.6
 });
 
-const pupupStyle = (orientation, parentSize) => ({
+const detailStyle = (orientation, parentSize, detail) => ({
+  display: detail ? 'flex' : 'none',
   flexGrow: 0,
   order: 4,
   borderColor: 'cyan',
@@ -48,26 +50,25 @@ const pupupStyle = (orientation, parentSize) => ({
   height: orientation === 'landscape' ? parentSize.height : parentSize.height * 0.6
 });
 
-const mainStyle = (orientation, parentSize, maximize, split) => {
+const mainStyle = (orientation, parentSize, maximize, detail) => {
   const cond = `(${orientation}, ${maximize})`;
-  console.log(cond, split);
   const baseStyle = { borderColor: 'red', borderWidth: 1, flexGrow: 1, overflow: 'hidden' };
   switch (cond) {
     case '(landscape, false)': {
-      const percentage = split ? 0.5 : 0.712;
+      const percentage = detail ? 0.5 : 0.712;
       const width = parentSize.width * percentage;
       const height = parentSize.height - 60;
       return { ...baseStyle, width, height };
     }
     case '(landscape, true)': {
-      const percentage = split ? 0.5 : 1.0;
+      const percentage = detail ? 0.5 : 1.0;
       const width = parentSize.width * percentage;
       const height = parentSize.height - 60;
       return { ...baseStyle, width, height };
     }
     default: {
       const percentage = 0.4;  // flexGrowで伸びるから固定値でOK
-      // const flexGrow = split ? 0 : 1;
+      // const flexGrow = detail ? 0 : 1;
       const width = parentSize.width;
       const height = parentSize.height * percentage - 60;
       return { ...baseStyle, width, height/*, flexGrow*/ };
@@ -75,17 +76,17 @@ const mainStyle = (orientation, parentSize, maximize, split) => {
   }
 };
 
-const footerStyle = (orientation, parentSize, footerHeight, maximize, split) => {
+const footerStyle = (orientation, parentSize, footerHeight, maximize, detail) => {
   const cond = `(${orientation}, ${maximize})`;
   const baseStyle = { height: footerHeight, borderColor: 'yellow', borderWidth: footerHeight < 1 ? 0 : 2 };
   switch (cond) {
     case '(landscape, false)': {
-      const percentage = split ? 0.5 : 0.712;
+      const percentage = detail ? 0.5 : 0.712;
       const width = parentSize.width * percentage;
       return { ...baseStyle, width };
     }
     case '(landscape, true)': {
-      const percentage = split ? 0.5 : 1.0;
+      const percentage = detail ? 0.5 : 1.0;
       const width = parentSize.width * percentage;
       return { ...baseStyle, width };
     }
@@ -96,9 +97,9 @@ const footerStyle = (orientation, parentSize, footerHeight, maximize, split) => 
   }
 };
 
-const subStyle = (orientation, parentSize, activity) => {
+const subStyle = (orientation, parentSize, activity, detail) => {
   const baseStyle = { overflow: 'hidden', borderColor: 'blue', borderWidth: 1, zIndex: 1 };
-  const display = activity ? 'flex' : 'none';
+  const display = (detail || !activity) ? 'none' : 'flex';
   const isLandscape = orientation === 'landscape';
   const position = isLandscape ? 'static' : 'absolute';
   const width = isLandscape ? parentSize.width * 0.288 : parentSize.width * 0.44;
@@ -108,62 +109,60 @@ const subStyle = (orientation, parentSize, activity) => {
   return { ...baseStyle, display, position, width, height, right, bottom };
 };
 
-const dStyle = (orientation, layout, parentSize, split) => {
+const dStyle = (orientation, layout, parentSize, detail) => {
   const maximize = R.includes(layout, [2, 3]);
   switch (layout) {
     case 1: 
-      return { ...mainStyle(orientation, parentSize, maximize, split), order: 1 };
+      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
     case 2:
-      return { ...mainStyle(orientation, parentSize, maximize, split), order: 1 };
+      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
     case 3:
       return { display: 'none' };
     case 4:
-      return split ? { display: 'none' } : { ...subStyle(orientation, parentSize, SUB), order: 3 };
+      return { ...subStyle(orientation, parentSize, SUB, detail), order: 3 };
     default:
       return {};
   }
 };
 
-const bStyle = (orientation, layout, parentSize, split) => {
+const bStyle = (orientation, layout, parentSize, detail) => {
   const maximize = R.includes(layout, [2, 3]);
-  return { ...footerStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, split), order: 2 };
+  return { ...footerStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, detail), order: 2 };
 };
 
-const vStyle = (orientation, layout, parentSize, split) => {
+const vStyle = (orientation, layout, parentSize, detail) => {
   const maximize = R.includes(layout, [2, 3]);
   switch (layout) {
     case 1:
-      return split ? { display: 'none' } : { ...subStyle(orientation, parentSize, SUB), order: 3 };
+      return { ...subStyle(orientation, parentSize, SUB, detail), order: 3 };
     case 2:
       return { display: 'none' };
-    case 3: {
-      return { ...mainStyle(orientation, parentSize, maximize, split), order: 1 };
-    }
-    case 4: {
-      return { ...mainStyle(orientation, parentSize, maximize, split), order: 1 };
-    }
+    case 3:
+      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
+    case 4:
+      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
     default:
       return {};
   }
 };
 
-const iStyle = (orientation, layout, parentSize, split) => {
+const iStyle = (orientation, layout, parentSize, detail) => {
   switch (layout) {
     case 1:
-      return split ? { display: 'none' } : interactionStyle(orientation, parentSize);
+      return interactionStyle(orientation, parentSize, detail);
     case 2:
       return { display: 'none' };
     case 3:
       return { display: 'none' };
     case 4:
-      return split ? { display: 'none' } : interactionStyle(orientation, parentSize);
+      return interactionStyle(orientation, parentSize, detail);
     default:
       return {};
   }
 };
 
-const sStyle = (orientation, parentSize, split) => {
-  return split ? pupupStyle(orientation, parentSize) : { display: 'none' };
+const sStyle = (orientation, parentSize, detail) => {
+  return detailStyle(orientation, parentSize, detail);
 };
 
 // mountやunmount等のライフサイクルやコンポーネント自体に状態を持たせたい場合はClassを使用する
@@ -196,27 +195,27 @@ class HomePage extends Component {
 
     const widget1Props = {
       no: 'd',
-      style: dStyle(this.state.orientation, LAYOUT, { width, height }, SPLIT)
+      style: dStyle(this.state.orientation, LAYOUT, { width, height }, DETAIL)
     };
 
     const widget2Props = {
       no: 'v',
-      style: vStyle(this.state.orientation, LAYOUT, { width, height }, SPLIT)
+      style: vStyle(this.state.orientation, LAYOUT, { width, height }, DETAIL)
     };
 
     const widget3Props = {
       no: 'b',
-      style: bStyle(this.state.orientation, LAYOUT, { width, height }, SPLIT)
+      style: bStyle(this.state.orientation, LAYOUT, { width, height }, DETAIL)
     };
 
     const widget4Props = {
       no: 'i',
-      style: iStyle(this.state.orientation, LAYOUT, { width, height }, SPLIT)
+      style: iStyle(this.state.orientation, LAYOUT, { width, height }, DETAIL)
     };
     
     const widget5Props = {
       no: 's',
-      style: sStyle(this.state.orientation, { width, height }, SPLIT)
+      style: sStyle(this.state.orientation, { width, height }, DETAIL)
     };
 
     return (
