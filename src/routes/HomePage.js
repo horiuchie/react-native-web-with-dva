@@ -29,14 +29,8 @@ const sideStyle = (orientation, parentSize, detail) => ({
   order: 4,
   borderColor: 'green',
   borderWidth: 1,
-  width:
-    orientation === 'landscape'
-      ? parentSize.width * 0.288
-      : parentSize.width,
-  height:
-    orientation === 'landscape'
-      ? parentSize.height * 0.75
-      : parentSize.height * 0.6
+  width: orientation === 'landscape' ? parentSize.width * 0.288 : parentSize.width,
+  height: orientation === 'landscape' ? parentSize.height * 0.75 : parentSize.height * 0.6
 });
 
 const detailStyle = (orientation, parentSize, detail) => ({
@@ -50,28 +44,27 @@ const detailStyle = (orientation, parentSize, detail) => ({
   height: orientation === 'landscape' ? parentSize.height : parentSize.height * 0.6
 });
 
-const mainStyle = (orientation, parentSize, maximize, detail) => {
+const mainStyle = (orientation, parentSize, footerHeight, maximize, detail) => {
   const cond = `(${orientation}, ${maximize})`;
-  const baseStyle = { borderColor: 'red', borderWidth: 1, flexGrow: 1, overflow: 'hidden' };
+  const baseStyle = { borderColor: 'red', borderWidth: 1/*, flexGrow: 1*/, overflow: 'hidden' };
   switch (cond) {
     case '(landscape, false)': {
       const percentage = detail ? 0.5 : 0.712;
       const width = parentSize.width * percentage;
-      const height = parentSize.height - 60;
+      const height = parentSize.height - footerHeight;
       return { ...baseStyle, width, height };
     }
     case '(landscape, true)': {
       const percentage = detail ? 0.5 : 1.0;
       const width = parentSize.width * percentage;
-      const height = parentSize.height - 60;
+      const height = parentSize.height - footerHeight;
       return { ...baseStyle, width, height };
     }
     default: {
-      const percentage = 0.4;  // flexGrowで伸びるから固定値でOK
-      // const flexGrow = detail ? 0 : 1;
+      const percentage = (maximize && !detail) ? 1.0 : 0.4;
       const width = parentSize.width;
-      const height = parentSize.height * percentage - 60;
-      return { ...baseStyle, width, height/*, flexGrow*/ };
+      const height = parentSize.height * percentage - footerHeight;
+      return { ...baseStyle, width, height };
     }
   }
 };
@@ -113,9 +106,9 @@ const dStyle = (orientation, layout, parentSize, detail) => {
   const maximize = R.includes(layout, [2, 3]);
   switch (layout) {
     case 1: 
-      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
+      return { ...mainStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, detail), order: 1 };
     case 2:
-      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
+      return { ...mainStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, detail), order: 1 };
     case 3:
       return { display: 'none' };
     case 4:
@@ -138,9 +131,9 @@ const vStyle = (orientation, layout, parentSize, detail) => {
     case 2:
       return { display: 'none' };
     case 3:
-      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
+      return { ...mainStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, detail), order: 1 };
     case 4:
-      return { ...mainStyle(orientation, parentSize, maximize, detail), order: 1 };
+      return { ...mainStyle(orientation, parentSize, FOOTER_HEIGHT, maximize, detail), order: 1 };
     default:
       return {};
   }
