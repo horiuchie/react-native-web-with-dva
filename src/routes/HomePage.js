@@ -8,15 +8,19 @@ const DETAIL = false;
 const SUB = true;
 const FOOTER_HEIGHT = 60;
 
-const Widget = ({ no, style }) => (
+const dimensionProps = (obj, path=[]) => R.o(
+  R.pick(['width', 'height']),
+  R.pathOr({ width: 0, height: 0 }, path)
+)(obj);
+
+const Widget = ({ no, style, dimensions }) => (
   <View
     style={{
-      height: '100%',
-      width: '100%',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      ...style
+      ...style,
+      ...dimensions
     }}
   >
     <Text>Widget No.{no}</Text>
@@ -214,11 +218,11 @@ class HomePage extends Component {
     return (
       <Page>
         <View onLayout={this.onLayout} style={containerStyle}>
-          <Widget {...widget1Props} />
-          <Widget {...widget2Props} />
-          <Widget {...widget3Props} />
-          <Widget {...widget4Props} />
-          <Widget {...widget5Props} />
+          <Widget {...widget1Props} dimensions={dimensionProps(widget1Props.style)} />
+          <Widget {...widget2Props} dimensions={dimensionProps(widget2Props.style)} />
+          <Widget {...widget3Props} dimensions={dimensionProps(widget3Props.style)} />
+          <Widget {...widget4Props} dimensions={dimensionProps(widget4Props.style)} />
+          <Widget {...widget5Props} dimensions={dimensionProps(widget5Props.style)} />
         </View>
       </Page>
     );
