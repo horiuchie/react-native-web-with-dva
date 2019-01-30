@@ -23,7 +23,7 @@ const Widget = ({ no, style }) => (
   </View>
 );
 
-const interactionStyle = (orientation, parentSize, detail) => ({
+const sideStyle = (orientation, parentSize, detail) => ({
   display: detail ? 'none' : 'flex',
   flexGrow: orientation === 'landscape' ? 1 : 0,
   order: 4,
@@ -149,13 +149,13 @@ const vStyle = (orientation, layout, parentSize, detail) => {
 const iStyle = (orientation, layout, parentSize, detail) => {
   switch (layout) {
     case 1:
-      return interactionStyle(orientation, parentSize, detail);
+      return sideStyle(orientation, parentSize, detail);
     case 2:
       return { display: 'none' };
     case 3:
       return { display: 'none' };
     case 4:
-      return interactionStyle(orientation, parentSize, detail);
+      return sideStyle(orientation, parentSize, detail);
     default:
       return {};
   }
